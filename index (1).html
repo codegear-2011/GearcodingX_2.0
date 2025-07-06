@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Learning Axis - Monaco Vertical</title>
+  <style>
+    :root {
+      --bg: #111;
+      --fg: #fff;
+      --editor-bg: #1e1e1e;
+      --tab-bg: #222;
+      --active-tab: orange;
+      --shadow: 0 0 20px orange;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: sans-serif;
+      margin: 0;
+      transition: background 0.5s, color 0.5s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .editor-container {
+      width: 90%;
+      max-width: 900px;
+      height: 90vh;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: var(--tab-bg);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.5s ease;
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #333;
+      padding: 8px 12px;
+    }
+
+    .dots .dot {
+      height: 12px;
+      width: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    .red { background: red; }
+    .yellow { background: yellow; }
+    .green { background: limegreen; }
+
+    .title {
+      font-weight: bold;
+      color: white;
+    }
+
+    .buttons button {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: white;
+      margin-left: 10px;
+      transition: transform 0.3s;
+    }
+
+    .buttons button:hover {
+      transform: scale(1.2);
+    }
+
+    .output-area {
+      height: 50%;
+      width: 100%;
+      border: none;
+      background: white;
+      transition: all 0.5s ease;
+    }
+
+    .fullscreen .code-section {
+      display: none;
+    }
+
+    .fullscreen .output-area {
+      height: 100%;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      background: var(--tab-bg);
+      padding: 6px;
+    }
+
+    .tabs button {
+      background: var(--tab-bg);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .tabs button.active {
+      background: var(--active-tab);
+    }
+
+    .code-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--editor-bg);
+    }
+
+    .code-area {
+      flex: 1;
+      background: var(--editor-bg);
+      color: white;
+      font-family: monospace;
+      font-size: 14px;
+      border: none;
+      padding: 10px;
+      resize: none;
+      transition: all 0.5s ease;
+    }
+
+    .code-area.hidden {
+      display: none;
+    }
+
+    /* Monaco layout fix */
+    .monaco-editor, .monaco-editor .overflow-guard {
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-container">
+    <div class="title-bar">
+      <div class="dots">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+      </div>
+      <div class="title">CODE GEAR</div>
+      <div class="buttons">
+        <button onclick="toggleDarkMode()">🌙</button>
+        <button onclick="toggleFullScreen()">🖥️</button>
+      </div>
+    </div>
+
+    <iframe id="output" class="output-area"></iframe>
+
+    <div class="tabs">
+      <button onclick="runCode()">Run</button>
+      <button onclick="switchTab('html')" class="active" id="tab-html">HTML</button>
+      <button onclick="switchTab('css')" id="tab-css">CSS</button>
+      <button onclick="switchTab('js')" id="tab-js">JavaScript</button>
+    </div>
+
+    <div class="code-section" id="code-section">
+      <div id="editor-html" class="code-area"></div>
+      <div id="editor-css" class="code-area hidden"></div>
+      <div id="editor-js" class="code-area hidden"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+  <script>
+    let editors = {};
+
+    require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+      editors.html = monaco.editor.create(document.getElementById('editor-html'), {
+        value: "",
+        language: "html",
+        theme: "vs-dark",
+        automaticLayout: true
+      });
+
+      editors.css = monaco.editor.create(document.getElementById('editor-css'), {
+        value: "",
+        language: "css",
+        theme: "vs-dark",
+        automaticLayout: true
+      });
+
+      editors.js = monaco.editor.create(document.getElementById('editor-js'), {
+        value: "",
+        language: "javascript",
+        theme: "vs-dark",
+        automaticLayout: true
+      });
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.code-area').forEach(area => area.classList.add('hidden'));
+      document.getElementById('editor-' + tab).classList.remove('hidden');
+
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    function runCode() {
+      const html = editors.html.getValue();
+      const css = `<style>${editors.css.getValue()}</style>`;
+      const js = `<script>${editors.js.getValue()}<\/script>`;
+      document.getElementById('output').srcdoc = html + css + js;
+    }
+
+    function toggleDarkMode() {
+      const root = document.documentElement;
+      if (root.style.getPropertyValue('--bg') === '#111') {
+        root.style.setProperty('--bg', '#f4f4f4');
+        root.style.setProperty('--fg', '#111');
+        root.style.setProperty('--editor-bg', '#fff');
+        root.style.setProperty('--tab-bg', '#ddd');
+        root.style.setProperty('--active-tab', '#007bff');
+        root.style.setProperty('--shadow', '0 0 15px #007bff');
+        monaco.editor.setTheme("vs");
+      } else {
+        root.style.setProperty('--bg', '#111');
+        root.style.setProperty('--fg', '#fff');
+        root.style.setProperty('--editor-bg', '#1e1e1e');
+        root.style.setProperty('--tab-bg', '#222');
+        root.style.setProperty('--active-tab', 'orange');
+        root.style.setProperty('--shadow', '0 0 20px orange');
+        monaco.editor.setTheme("vs-dark");
+      }
+    }
+
+    function toggleFullScreen() {
+      document.querySelector('.editor-container').classList.toggle('fullscreen');
+    }
+  </script>
+</body>
+</html>
