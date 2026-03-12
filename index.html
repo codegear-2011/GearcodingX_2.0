@@ -241,9 +241,15 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
       }
     }
 
-    function toggleFullScreen() {
-      document.querySelector('.editor-container').classList.toggle('fullscreen');
-    }
-  </script>
+    function fullscreen() {
+  let elem = document.documentElement;
+
+  if (!document.fullscreenElement) {
+    elem.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+        }
+</script>
 </body>
 </html>
