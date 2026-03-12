@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CODE GEAR</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+:root{
+--bg:#111;
+--editor:#1e1e1e;
+--tab:#222;
+--accent:#ff9800;
+}
+
+body{
+margin:0;
+background:var(--bg);
+font-family:sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.editor{
+width:900px;
+height:90vh;
+background:#222;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 0 20px orange;
+display:flex;
+flex-direction:column;
+}
+
+.titlebar{
+background:#333;
+padding:8px 12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+color:white;
+}
+
+.dots span{
+height:12px;
+width:12px;
+border-radius:50%;
+display:inline-block;
+margin-right:6px;
+}
+
+.red{background:red}
+.yellow{background:yellow}
+.green{background:limegreen}
+
+.controls i{
+cursor:pointer;
+margin-left:15px;
+}
+
+iframe{
+height:50%;
+border:none;
+background:white;
+}
+
+.tabs{
+display:flex;
+background:#222;
+}
+
+.tabs button{
+flex:1;
+background:#222;
+color:white;
+border:none;
+padding:10px;
+cursor:pointer;
+}
+
+.tabs button.active{
+background:var(--accent);
+}
+
+.code{
+flex:1;
+}
+
+.editor-box{
+height:100%;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="editor">
+
+<div class="titlebar">
+
+<div class="dots">
+<span class="red"></span>
+<span class="yellow"></span>
+<span class="green"></span>
+</div>
+
+<div>CODE GEAR</div>
+
+<div class="controls">
+<i class="fa-solid fa-moon" onclick="toggleTheme()"></i>
+<i class="fa-solid fa-expand" onclick="fullscreen()"></i>
+</div>
+
+</div>
+
+<iframe id="output"></iframe>
+
+<div class="tabs">
+
+<button onclick="runCode()">
+<i class="fa fa-play"></i> Run
+</button>
+
+<button id="tab-html" class="active" onclick="switchTab('html')">
+<i class="fa-brands fa-html5"></i>
+HTML
+</button>
+
+<button id="tab-css" onclick="switchTab('css')">
+<i class="fa-brands fa-css3-alt"></i>
+CSS
+</button>
+
+<button id="tab-js" onclick="switchTab('js')">
+<i class="fa-brands fa-js"></i>
+JS
+</button>
+
+</div>
+
+<div class="code">
+
+<div id="editor-html" class="editor-box"></div>
+<div id="editor-css" class="editor-box hidden"></div>
+<div id="editor-js" class="editor-box hidden"></div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+
+<script>
+
+let editors={}
+
+require.config({
+paths:{vs:'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs'}
+})
+
+require(['vs/editor/editor.main'],function(){
+
+editors.html = monaco.editor.create(
+document.getElementById('editor-html'),
+{
+value:"",
+language:"html",
+theme:"vs-dark",
+automaticLayout:true
+})
+
+editors.css = monaco.editor.create(
+document.getElementById('editor-css'),
+{
+value:"",
+language:"css",
+theme:"vs-dark",
+automaticLayout:true
+})
+
+editors.js = monaco.editor.create(
+document.getElementById('editor-js'),
+{
+value:"",
+language:"javascript",
+theme:"vs-dark",
+automaticLayout:true
+})
+
+})
+
+function switchTab(tab){
+
+document.querySelectorAll(".editor-box")
+.forEach(e=>e.classList.add("hidden"))
+
+document.getElementById("editor-"+tab)
+.classList.remove("hidden")
+
+document.querySelectorAll(".tabs button")
+.forEach(b=>b.classList.remove("active"))
+
+document.getElementById("tab-"+tab)
+.classList.add("active")
+
+}
+
+function runCode(){
+
+let html = editors.html.getValue()
+let css = "<style>"+editors.css.getValue()+"</style>"
+let js = "<script>"+editors.js.getValue()+"<\/script>"
+
+document.getElementById("output").srcdoc =
+html + css + js
+
+}
+
+function toggleTheme(){
+
+if(document.body.style.background=="white"){
+
+document.body.style.background="#111"
+monaco.editor.setTheme("vs-dark")
+
+}else{
+
+document.body.style.background="white"
+monaco.editor.setTheme("vs")
+
+}
+
+}
+
+function fullscreen(){
+document.querySelector(".editor")
+.requestFullscreen()
+}
+
+</script>
+
+</body>
+</html>
