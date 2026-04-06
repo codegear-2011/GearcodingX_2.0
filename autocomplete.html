@@ -181,30 +181,34 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   <script>
     let editors = {};
 
-    require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
-    require(['vs/editor/editor.main'], function () {
-      editors.html = monaco.editor.create(document.getElementById('editor-html'), {
-        value: "",
-        language: "html",
-        theme: "vs-dark",
-        automaticLayout: true
-      });
+require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
 
-      editors.css = monaco.editor.create(document.getElementById('editor-css'), {
-        value: "",
-        language: "css",
-        theme: "vs-dark",
-        automaticLayout: true
-      });
+require(['vs/editor/editor.main'], function () {
 
-      editors.js = monaco.editor.create(document.getElementById('editor-js'), {
-        value: "",
-        language: "javascript",
-        theme: "vs-dark",
-        automaticLayout: true
-      });
-    });
-const demoHTML = `<!DOCTYPE html>
+  // ✅ editors create
+  editors.html = monaco.editor.create(document.getElementById('editor-html'), {
+    value: "",
+    language: "html",
+    theme: "vs-dark",
+    automaticLayout: true
+  });
+
+  editors.css = monaco.editor.create(document.getElementById('editor-css'), {
+    value: "",
+    language: "css",
+    theme: "vs-dark",
+    automaticLayout: true
+  });
+
+  editors.js = monaco.editor.create(document.getElementById('editor-js'), {
+    value: "",
+    language: "javascript",
+    theme: "vs-dark",
+    automaticLayout: true
+  });
+
+  // 🔥 demo codes
+  const demoHTML = `<!DOCTYPE html>
 <html>
 <head>
   <title>Auto Typing Demo</title>
@@ -224,7 +228,7 @@ const demoHTML = `<!DOCTYPE html>
 
   const demoJS = `console.log("Auto typing running 🚀");`;
 
-  // 🔥 Sequential Typing (HTML → CSS → JS → Run)
+  // 🔥 start typing AFTER Monaco ready
   typeSequence([
     () => switchTab('html'),
     () => typeCode(editors.html, demoHTML, 40, 5),
@@ -239,8 +243,6 @@ const demoHTML = `<!DOCTYPE html>
   ]);
 
 });
-
-
 // 🔥 Typing Engine
 function typeCode(editor, code, speed = 50, chunkSize = 3) {
   return new Promise(resolve => {
