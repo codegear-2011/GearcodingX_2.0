@@ -467,6 +467,7 @@ function typeCode(editor, code, speed = 50, chunkSize = 3) {
         const chunk = code.slice(i, i + chunkSize);
         editor.setValue(editor.getValue() + chunk);
         i += chunkSize;
+        editor.revealLineInCenter(editor.getModel().getLineCount());
         setTimeout(type, speed);
       } else {
         resolve();
